@@ -1,9 +1,7 @@
-# saint-yellow/western-chess
-
-## 前端习作 #01: 国际象棋, HTML+CSS+jQuery
+国际象棋, HTML+CSS+jQuery
 
 ### 在线演示
-https://saint-yellow.github.io/western-chess
+http://syjsu.github.io/chess-with-html/
 
 ### 截图演示
 ![preview](./readme/preview.png)
