@@ -1,57 +1,97 @@
 /*
     game.js: 实现游戏逻辑
 */
+let side = "white";//default, choose before the game beginning
+let other = "black";
+let last_round = 0;
+let turn = 0;
+
+function choose(s){
+    sessionStorage.setItem("side", s);
+    window.location.href="./index.html";
+}
 
 function game() {
-    // 棋盘的横坐标轴
+    side = sessionStorage.getItem("side");
+    other = (side == "white")?"black":"white";
+    turn = (side == "white")?"white" : "black";
+    function checkForNewMoves() {
+        // console.log("check");
+        fetch("./php/check_last_move.php")
+            .then(response => response.json())
+            .then(data => {
+                // console.log(data);
+                if (data.status == "success" && data.color == other && data.round > last_round) {
+                    updateBoard(data);
+                }
+            })
+            // .catch(error => console.error("Error checking new moves: ", error));
+    }
+    // 模擬輪循每隔一段時間檢查一次
+    setInterval(checkForNewMoves, 1000); // 每秒檢查一次
+
+    function updateBoard(data) {
+        var $fromGrid = $("#"+data.start_pos);
+        last_round = data.round;
+        var $piece1 = $($fromGrid.children(".chess")[0]);
+        var $toGrid = $("#" + data.end_pos);
+        if($toGrid.children(".chess").length > 0){
+            $toGrid.empty();
+        }
+        $toGrid.append($piece1);
+        turn = 1;
+        finish();
+    }
+
+    // x-axis
     const xAxis = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
-    // 棋盘的纵坐标轴
+    // y-axis
     const yAxis = [1, 2, 3, 4, 5, 6, 7, 8];
 
     var action = [];
 
-    // 获取网格的ID
+    // 取得位置座標
     function getPosition(grid) {
         var gridId = $(grid).attr("id");
-        var x = gridId[0];
-        var y = parseInt(gridId[1]);
+        var x = gridId[0];      //取得x座標
+        var y = parseInt(gridId[1]);        //取得y座標
 
         return [x, y];
     }
 
-    // 将军
+    // checkmate
     function checkmate(piece) {
         var attackableGrids = attackableScope(piece);
-        for (var gridId of attackableGrids) {
-            var grid = $("#"+gridId);
+        for (var gridId of attackableGrids) {       //確認每一格可以到達的地方
+            var grid = $("#"+gridId);       //get DOM element
             if ($(grid.children()[0]).hasClass("king")) {
                 color([gridId], "checkmate");
             }
         }
     }
 
-    // 结束游戏
+    // gameover
     function finish() {
         if (document.getElementById("black-king") == undefined) {
-            alert("白方胜利");
+            alert("白方勝利");
             return;
         }
 
         if (document.getElementById("white-king") == undefined) {
-            alert("黑方胜利");
+            alert("黑方勝利");
             return;
         }
     }
 
-    // 着色
+    // color
     function color(grids, className) {
         for (var grid of grids) {
             $("#"+grid).toggleClass(className);
         }
     }
 
-    // 行动前褪色
+    // for action
     function clearBaforeMove() {
         $(".grid").removeClass("active");
         $(".grid.movable-scope").removeClass("movable-scope");
@@ -59,27 +99,33 @@ function game() {
         $(".grid.checkmate").removeClass("checkmate");
     }
 
-    // 行动后褪色
     function clearAfterMove() {
         $(".grid.active").removeClass("active");
         $(".grid.movable-scope").removeClass("movable-scope");
         $(".grid.attackable-scope").removeClass("attackable-scope");
     }
 
-    // 清除行动记录
+    // clear action
     function clearAction() {
         while (action.length > 0) {
             action.pop();
         }
     }
 
-    $(".grid").click(function () {
-        clearBaforeMove();
+    // check this after
+    $(".grid").click(function () {      //點擊偵測
         var $grid = $(this);
+        if(turn == 0){
+            return;
+        }
+        if(action.length == 0 && $grid.children("." + other).length > 0){
+            return;
+        }
+        clearBaforeMove();
         $grid.toggleClass("active");
-
-        if (action.length == 0) {
-            if ($grid.children(".chess").length == 1) {
+        console.log(action.length);
+        if (action.length == 0) {       //選擇棋子
+            if ($grid.children(".chess").length == 1) {     
                 var $piece1 = $($grid.children(".chess")[0]);
                 
                 var movableGrids = movableScope($piece1);
@@ -91,18 +137,19 @@ function game() {
                 action.push($piece1.attr("color"));
                 action.push($piece1.attr("type"));
                 action.push($grid.attr("id"));
+                console.log(action);        //debug
             }
             return;
         }
 
-        if (action.length == 3) {
+        if (action.length == 3) {       //移動
             var $fromGrid = $("#"+action[2]);
             var $piece1 = $($fromGrid.children(".chess")[0]);
 
             var movableGrids = movableScope($piece1);
             var attackableGrids = attackableScope($piece1);
 
-            // 目标格子
+            // target block
             var gridId = $grid.attr("id");
 
             if (gridId != action[2] && (movableGrids.indexOf(gridId) != -1 || attackableGrids.indexOf(gridId) != -1)) {
@@ -152,30 +199,47 @@ function game() {
             }
 
             action.push(gridId);
-            return;
+            console.log(JSON.stringify({action}));
+            //push the data into database
+            fetch("./php/save_action.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.status === "success") {
+                    console.log("Actions saved successfully!");
+                } else {
+                    console.error("Error saving actions:", data.message);
+                }
+            })
+            .catch((error) => console.error("Fetch error:", error));
+            turn = 0;
+            clearAction();
         }
 
-        if (action.length == 4) {
-            if ($grid.children(".chess").length == 1) {
-                var $piece1 = $($grid.children(".chess")[0]);
+        // if (action.length == 4) {
+        //     if ($grid.children(".chess").length == 1) {
+        //         var $piece1 = $($grid.children(".chess")[0]);
 
-                if ($piece1.attr("color") != action[0]) {
-                    var movableGrids = movableScope($piece1);
-                    color(movableGrids, "movable-scope");
+        //         if ($piece1.attr("color") != action[0]) {
+        //             var movableGrids = movableScope($piece1);
+        //             color(movableGrids, "movable-scope");
 
-                    var attackableGrids = attackableScope($piece1);
-                    color(attackableGrids, "attackable-scope");
+        //             var attackableGrids = attackableScope($piece1);
+        //             color(attackableGrids, "attackable-scope");
 
-                    clearAction();
-                    action.push($piece1.attr("color"));
-                    action.push($piece1.attr("type"));
-                    action.push($grid.attr("id"));
-                }                
-            }
-            return;
-        }
+        //             clearAction();
+        //             action.push($piece1.attr("color"));
+        //             action.push($piece1.attr("type"));
+        //             action.push($grid.attr("id"));
+        //         }                
+        //     }
+        //     return;
+        // }
     });
-
+    //確認可到達的位置
     function movableScope(piece) {
         var scope = [];
         var position = getPosition(piece.parent());
@@ -327,7 +391,7 @@ function game() {
             return scope;
         }
     }
-
+    //確認可攻擊的位置
     function attackableScope(piece) {
         var scope = [];
 
@@ -565,5 +629,8 @@ function game() {
     }
 }
 
-game();
+if(window.location.pathname.endsWith("/index.html")){
+    game();
+}
+
 
