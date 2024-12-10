@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Western Chess</title>
+    <link href="./css/styles.css" rel="stylesheet" type="text/css">
+    <link href="./css/tailwind.min.css" rel="stylesheet" type="text/css">
+    <script src="./js/lib/jquery.min.js"></script>
+</head>
+<!-- <title>final_project</title> -->
+<body>
+    <div class="flex justify-center item-center h-screen">
+        <div class="board">
+            <div class="blank"></div>
+            <div class="x-axis">A</div>
+            <div class="x-axis">B</div>
+            <div class="x-axis">C</div>
+            <div class="x-axis">D</div>
+            <div class="x-axis">E</div>
+            <div class="x-axis">F</div>
+            <div class="x-axis">G</div>
+            <div class="x-axis">H</div>
+            <div class="blank"></div>
+            <div class="y-axis">8</div>
+            <div id="A8" class="grid black">
+                <div class="chess black rook" color="black" type="rook"></div>
+            </div>
+            <div id="B8" class="grid white">
+                <div class="chess black knight" color="black" type="knight"></div>
+            </div>
+            <div id="C8" class="grid black">
+                <div class="chess black bishop" color="black" type="bishop"></div>
+            </div>
+            <div id="D8" class="grid white">
+                <div class="chess black queen" color="black" type="queen"></div>
+            </div>
+            <div id="E8" class="grid black">
+                <div id="black-king" class="chess black king" color="black" type="king"></div>
+            </div>
+            <div id="F8" class="grid white">
+                <div class="chess black bishop" color="black" type="bishop"></div>
+            </div>
+            <div id="G8" class="grid black">
+                <div class="chess black knight" color="black" type="knight"></div>
+            </div>
+            <div id="H8" class="grid white">
+                <div class="chess black rook" color="black" type="rook"></div>
+            </div>
+            <div class="y-axis">8</div>
+            <div class="y-axis">7</div>
+            <div id="A7" class="grid white">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="B7" class="grid black">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="C7" class="grid white">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="D7" class="grid black">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="E7" class="grid white">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="F7" class="grid black">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="G7" class="grid white">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div id="H7" class="grid black">
+                <div class="chess black pawn initial" color="black" type="pawn"></div>
+            </div>
+            <div class="y-axis">7</div>
+            <div class="y-axis">6</div>
+            <div id="A6" class="grid black"></div>
+            <div id="B6" class="grid white"></div>
+            <div id="C6" class="grid black"></div>
+            <div id="D6" class="grid white"></div>
+            <div id="E6" class="grid black"></div>
+            <div id="F6" class="grid white"></div>
+            <div id="G6" class="grid black"></div>
+            <div id="H6" class="grid white"></div>
+            <div class="y-axis">6</div>
+            <div class="y-axis">5</div>
+            <div id="A5" class="grid white"></div>
+            <div id="B5" class="grid black"></div>
+            <div id="C5" class="grid white"></div>
+            <div id="D5" class="grid black"></div>
+            <div id="E5" class="grid white"></div>
+            <div id="F5" class="grid black"></div>
+            <div id="G5" class="grid white"></div>
+            <div id="H5" class="grid black"></div>
+            <div class="y-axis">5</div>
+            <div class="y-axis">4</div>
+            <div id="A4" class="grid black"></div>
+            <div id="B4" class="grid white"></div>
+            <div id="C4" class="grid black"></div>
+            <div id="D4" class="grid white"></div>
+            <div id="E4" class="grid black"></div>
+            <div id="F4" class="grid white"></div>
+            <div id="G4" class="grid black"></div>
+            <div id="H4" class="grid white"></div>
+            <div class="y-axis">4</div>
+            <div class="y-axis">3</div>
+            <div id="A3" class="grid white"></div>
+            <div id="B3" class="grid black"></div>
+            <div id="C3" class="grid white"></div>
+            <div id="D3" class="grid black"></div>
+            <div id="E3" class="grid white"></div>
+            <div id="F3" class="grid black"></div>
+            <div id="G3" class="grid white"></div>
+            <div id="H3" class="grid black"></div>
+            <div class="y-axis">3</div>
+            <div class="y-axis">2</div>
+            <div id="A2" class="grid black">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="B2" class="grid white">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="C2" class="grid black">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="D2" class="grid white">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="E2" class="grid black">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="F2" class="grid white">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="G2" class="grid black">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div id="H2" class="grid white">
+                <div class="chess white pawn initial" color="white" type="pawn"></div>
+            </div>
+            <div class="y-axis">2</div>
+            <div class="y-axis">1</div>
+            <div id="A1" class="grid white">
+                <div class="chess white rook" color="white" type="rook"></div>
+            </div>
+            <div id="B1" class="grid black">
+                <div class="chess white knight" color="white" type="knight"></div>
+            </div>
+            <div id="C1" class="grid white">
+                <div class="chess white bishop" color="white" type="bishop"></div>
+            </div>
+            <div id="D1" class="grid black">
+                <div class="chess white queen" color="white" type="queen"></div>
+            </div>
+            <div id="E1" class="grid white">
+                <div id="white-king" class="chess white king" color="white" type="king"></div>
+            </div>
+            <div id="F1" class="grid black">
+                <div class="chess white bishop" color="white" type="bishop"></div>
+            </div>
+            <div id="G1" class="grid white">
+                <div class="chess white knight" color="white" type="knight"></div>
+            </div>
+            <div id="H1" class="grid black">
+                <div class="chess white rook" color="white" type="rook"></div>
+            </div>
+            <div class="y-axis">1</div>
+            <div class="blank"></div>
+            <div class="x-axis">A</div>
+            <div class="x-axis">B</div>
+            <div class="x-axis">C</div>
+            <div class="x-axis">D</div>
+            <div class="x-axis">E</div>
+            <div class="x-axis">F</div>
+            <div class="x-axis">G</div>
+            <div class="x-axis">H</div>
+            <div class="blank"></div>
+        </div>
+    </div>
+    
+    <script src="./js/game.js"></script>
+</body>
+
+</html>
