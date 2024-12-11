@@ -3,36 +3,128 @@
 */
 let side = "white";//default, choose before the game beginning
 let other = "black";
-let last_round = 0;
+let last_round = parseInt(-1);
 let turn = 0;
+let switch_time = "";
+let init_time = parseInt(300);
+let black_time = parseInt(300);
+let white_time = parseInt(300);
 
 function choose(s){
     sessionStorage.setItem("side", s);
-    window.location.href="./index.html";
+    window.location.href="/website_final_project/index.html";
+}
+
+function formatTime(seconds) {
+    let minutes = Math.floor(seconds / 60);
+    let sec = seconds % 60;
+    return `${minutes < 10 ? '0' : ''}${minutes}:${sec < 10 ? '0' : ''}${sec}`;
 }
 
 function game() {
     side = sessionStorage.getItem("side");
     other = (side == "white")?"black":"white";
     turn = (side == "white")?"white" : "black";
+    console.log("initial round:", last_round);
     function checkForNewMoves() {
         // console.log("check");
-        fetch("./php/check_last_move.php")
+        fetch(`./php/check_last_move.php?target_round=${parseInt(last_round) + 1}`)
             .then(response => response.json())
             .then(data => {
                 // console.log(data);
-                if (data.status == "success" && data.color == other && data.round > last_round) {
+                //console.log("target round:", last_round + 1, "finded round:", data.round);
+                if (data.status == "success" && data.round > last_round) {
+                    console.log("updateBoard", data);
                     updateBoard(data);
                 }
             })
-            // .catch(error => console.error("Error checking new moves: ", error));
+            .catch(error => console.error("Error checking:", error));
     }
     // 模擬輪循每隔一段時間檢查一次
-    setInterval(checkForNewMoves, 1000); // 每秒檢查一次
+    setInterval(checkForNewMoves, 200); // 每秒檢查一次
+
+    let timer = setInterval(function() {
+        console.log("before black:", black_time, "white:", white_time);
+        if (white_time >= 0 && last_round % 2 == 0){
+            white_time--;
+        }
+        if (black_time >= 0 && last_round % 2 == 1){
+            black_time--;
+        }
+        if (white_time < 0){
+            clearInterval(timer);  // Stop the timer when time reaches 0
+            console.log("White Time's up!");
+        }
+        if (black_time < 0){
+            clearInterval(timer);  // Stop the timer when time reaches 0
+            console.log("Black Time's up!");
+        }
+        console.log("black:", black_time, "white:", white_time);
+        document.getElementById("time-player-1").textContent = formatTime(black_time);
+        document.getElementById("time-player-2").textContent = formatTime(white_time);
+    }, 1000);
+
+    function updateTable(data){
+        const tableBody = document.querySelector("#move-history tbody");
+        // Create a new row
+        const row = document.createElement("tr");
+        // Create cells for Move #, Color, and Movement
+        const moveNumberCell = document.createElement("td");
+        moveNumberCell.textContent = data.round;
+        const colorCell = document.createElement("td");
+        colorCell.textContent = data.color;
+        const typeCell = document.createElement("td");
+        typeCell.textContent = data.chess;
+        const movementCell = document.createElement("td");
+        movementCell.textContent = `${data.start_pos} → ${data.end_pos}`;
+        // Append cells to the row
+        row.appendChild(moveNumberCell);
+        row.appendChild(colorCell);
+        row.appendChild(typeCell);
+        row.appendChild(movementCell);
+        // Append the row to the table body
+        tableBody.appendChild(row);
+
+        if (data.color == "white"){
+            document.getElementById("black-indicator").innerHTML = `<span style="color: red;">&#x25B2;</span>Player Black<span style="color: red;">&#x25B2;</span>`
+            document.getElementById("white-indicator").innerHTML = "&#x25B2;Player White&#x25B2;"
+        }
+        else{
+            document.getElementById("black-indicator").innerHTML = "&#x25B2;Player Black&#x25B2;"
+            document.getElementById("white-indicator").innerHTML = `<span span style="color: red;">&#x25B2;</span>Player White<span span style="color: red;">&#x25B2;</span>`
+        }
+
+        while (tableBody.rows.length > 10) {
+            tableBody.deleteRow(0); // Remove the first row
+        }
+    }
 
     function updateBoard(data) {
-        var $fromGrid = $("#"+data.start_pos);
+        black_time = data.black_time;
+        white_time = data.white_time;
         last_round = data.round;
+
+        if (data.color == "white" && data.round > 0){
+            let pre_time = new Date(data.time_stamp);
+            let cur_time = new Date();
+            //console.log("pre:", pre_time, "cur:", cur_time, "dif:", Math.floor((pre_time - cur_time) / 1000));
+            black_time -= Math.floor((cur_time - pre_time) / 1000);
+        }
+        if (data.color == "black" || data.round == 0){
+            let pre_time = new Date(data.time_stamp);
+            let cur_time = new Date();
+            //console.log("pre:", pre_time, "cur:", cur_time, "dif:", Math.floor((pre_time - cur_time) / 1000));
+            white_time -= Math.floor((cur_time - pre_time) / 1000);
+        }
+
+        if (data.round == 0) {
+            const modal = document.getElementById("waiting-modal");
+            modal.classList.remove("show");
+            return;
+        }
+        updateTable(data);
+
+        var $fromGrid = $("#"+data.start_pos);
         var $piece1 = $($fromGrid.children(".chess")[0]);
         var $toGrid = $("#" + data.end_pos);
         if($toGrid.children(".chess").length > 0){
@@ -115,6 +207,15 @@ function game() {
     // check this after
     $(".grid").click(function () {      //點擊偵測
         var $grid = $(this);
+
+        if (side == "white" && last_round % 2 == 1){ // 檢查是否輪到自己
+            return;
+        }
+
+        if (side == "black" && last_round % 2 == 0){
+            return;
+        }
+
         if(turn == 0){
             return;
         }
@@ -197,9 +298,19 @@ function game() {
                 clearAction();
                 return;
             }
-
+            last_round = parseInt(last_round) + 1;
             action.push(gridId);
             console.log(JSON.stringify({action}));
+
+            // update table
+            const newMove = {chess: action[1], round: last_round, color: side, start_pos: action[2], end_pos: action[3]};
+            updateTable(newMove);
+
+            // caclulate remaining time!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            action.push(black_time);
+            action.push(white_time);
+
             //push the data into database
             fetch("./php/save_action.php", {
                 method: "POST",
@@ -630,6 +741,7 @@ function game() {
 }
 
 if(window.location.pathname.endsWith("/index.html")){
+    console.log("initround0:", last_round);
     game();
 }
 
