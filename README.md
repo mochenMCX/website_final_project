@@ -1,38 +1,12 @@
-国际象棋, HTML+CSS+jQuery
+國際象棋, HTML+CSS+jQuery
 
-### 在线演示
-http://syjsu.github.io/chess-with-html/
+### 使用方法
 
-### 截图演示
-![preview](./readme/preview.png)
-![demo](./readme/demo.gif)
+1. 匯入資料庫 movement.sql，注意你phpmyadmin的root密碼應該要設定空的! (即"")，不然你必須到每個.php檔把裡面的$password改成你對應的密碼。
 
-### 目前已经完成的事
-- 布局
-- 单人对局
-- 各类棋子的走法
-- 简单的checkmate perception\
-\
-(注: 暂未支持士兵升格和王车易位)
+2. 把整個資料夾(website_final_project) 丟在 xampp/htdocs (不能只把資料夾內容丟進去，不然有些file path會錯)
 
-### 以后可能会做的事
-- 优化代码
-- ~~胜负判定~~
-- 更准确的checkmate perception
-- 动画
-- 基于TypeScript的React化
-- 添加后端 (Flask/ASP.NET Core/...)
-- 双人对局
-- etc
+3. 開啟兩個分頁 "http://localhost/website_final_project/main_lobby.html"
 
-### 启动
-```
-git clone https://github.com/saint-yellow/western-chess.git
-cd western-chess
-python -m http.server:6000
-```
-或者使用Visual Studio Code的Live Server插件启动该项目
+4. 其中一個按create game，另一個再按join game，並根據前者的game_id (會彈出視窗告知) 加入對應的房間。
 
-### 更新
-- fix: 黑白双方每回合只能移动自己的一只棋子 (2020-03-23)
-- feature: 简单的胜负判定 (2020-03-25)

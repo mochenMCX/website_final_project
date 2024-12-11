@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create or Join Game</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /*color: #fff;*/
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 40px;
+            color: #444;
+        }
+
+        /* Button Styles */
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px 30px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 200px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            transform: translateY(-3px);
+        }
+
+        .button:active {
+            background-color: #388e3c;
+            transform: translateY(0);
+        }
+
+        .button.disabled {
+            background-color: #d3d3d3;
+            cursor: not-allowed;
+        }
+
+        /* Player Selection Form */
+        #player-selection {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        #player-selection h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .radio-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        /* Username Input */
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .button {
+                width: 90%;
+            }
+
+            #player-selection {
+                width: 90%;
+            }
+        }
+
+        /* Main container for the game list */
+        .game-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center; /* Centers content horizontally */
+            margin: 20px 0;
+        }
+
+        /* Each game option (card style) */
+        .game-option {
+            margin: 15px;
+            background-color: #dbd7da;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #736f72;
+            gap: 30px;
+            padding: 20px;
+            width: 280px; /* Set a fixed width to maintain alignment */
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        /* Game card hover effect */
+        .game-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styling for game details */
+        .game-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Styling for the join button */
+        .game-option button {
+            background-color: #545053;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        /* Button hover effect */
+        .game-option button:hover {
+            background-color: #383537;
+        }
+
+        /* Card hover effect */
+        .game-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        #availableGamesTitle {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        .go-back {
+            width: 150px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #a094a1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: none;
+        }
+
+        .go-back:hover {
+            background-color: #877787;
+            transform: scale(1.05); /* Slightly enlarge on hover for better UX */
+        }
+
+        .go-back:active {
+            background-color: #9f75a1;
+        }
+        
+
+    </style>
+</head>
+<body>
+
+    <button id="goBackButton" class="go-back" onclick="refreshPage()">Go Back</button>
+
+    <h1 >Game Lobby</h1>
+    
+    <!-- Main buttons -->
+    <button class="button" id="createGameBtn">Create Game</button>
+    <button class="button" id="joinGameBtn">Join Game</button>
+
+    <!-- Player selection form (initially hidden) -->
+    <div id="player-selection">
+        <h2>Choose your color and enter your username</h2>
+        <form id="createGameForm" action="create_game.php" method="POST">
+            <!-- Username input -->
+            <input type="text" name="username" placeholder="Enter your username" required><br>
+            
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="playerColor" value="black" required color="black"> Black
+                </label>
+                <label>
+                    <input type="radio" name="playerColor" value="white" color="black"> White
+                </label>
+            </div>
+            
+            <input type="submit" value="Start Game">
+        </form>
+    </div>
+
+    <div id="gameListContainer" class="game-list" style="display: none;">
+        <h3 id="availableGamesTitle">Available Games to Join:</h3>
+        <div id="gameList"></div>
+    </div>
+
+    <script>
+        function refreshPage() {
+            location.reload(); // Refreshes the page
+        }
+        // Button actions
+        document.getElementById("createGameBtn").addEventListener("click", function() {
+            // Show player selection form
+            document.getElementById("player-selection").style.display = "block";
+            document.getElementById("createGameBtn").style.display = "none";
+            document.getElementById("joinGameBtn").style.display = "none";
+            document.getElementById("goBackButton").style.display = "block";
+        });
+
+        document.getElementById("joinGameBtn").addEventListener("click", function() {
+            //alert("Join game functionality is not implemented yet.");
+            document.getElementById("createGameBtn").style.display = "none";
+            document.getElementById("joinGameBtn").style.display = "none";
+            document.getElementById("player-selection").style.display = "none";
+            document.getElementById("goBackButton").style.display = "block";
+            fetch('./php/search_game.php')
+                .then(response => response.json())
+                .then(data => {
+                    // Clear previous game list
+                    const gameListContainer = document.getElementById("gameList");
+                    gameListContainer.innerHTML = '';
+                    gameListContainer.style.display = "flex";
+                    gameListContainer.style.flexWrap = "wrap";
+                    gameListContainer.style.justifyContent = "center";
+
+                    // Display the games in the list
+                    if (data.length > 0) {
+                        data.forEach(game => {
+                            const gameOption = document.createElement("div");
+                            gameOption.className = 'game-option';
+
+                            // Create the game name and join button
+                            gameOption.innerHTML = `
+                                <div class="game-info">
+                                    <h4>Game ID: ${game.game_id}</h4>
+                                    <p><strong>Created By:</strong> ${game.host_player}</p>
+                                    <p><strong>You play:</strong> ${game.host_player_color == "white" ? "black" : "white"}</p>
+                                </div>
+                                <div class="game-actions">
+                                    <button class="join-btn" onclick="enterGame(${game.game_id})">Join Game</button>
+                                </div>
+                            `;
+                            gameListContainer.appendChild(gameOption);
+                        });
+
+                        // Show the game list container
+                        document.getElementById("gameListContainer").style.display = 'block';
+                    } else {
+                        gameListContainer.innerHTML = 'No available games to join.';
+                        document.getElementById("gameListContainer").style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching game list:', error);
+                    alert('Failed to load available games.');
+                });
+        });
+        function enterGame(gameId, color) {
+            // Create a form dynamically to submit the game_id to enter_game.php
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = './php/join_game.php';
+
+            // Create an input for game_id
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'game_id';
+            input.value = gameId;
+
+            form.appendChild(input);
+
+            // Append the form to the body and submit it
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+</body>
+</html>

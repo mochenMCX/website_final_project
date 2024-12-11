@@ -178,7 +178,55 @@
         </div>
     </div>
     
+    <link rel="stylesheet" href="/website_final_project/css/display_styles.css">
+
+    <div id="waiting-modal" class="modal show">
+        <div class="modal-content">
+            <h2>Waiting for other player to join...</h2>
+        </div>
+    </div>
+
+    <div class="chess-game">
+        <!-- Player Profiles -->
+        <div class="player-section">
+            <div class="player" id="player-1">
+                <h2 id = "black-indicator">Player Black</h2>
+                <div class="time">Time Left: <span id="time-player-1">10:00</span></div>
+            </div>
+            <div class="player" id="player-2">
+                <h2 id = "white-indicator"><span span style="color: red;">&#x25B2;</span>Player White<span span style="color: red;">&#x25B2;</span></h2>
+                <div class="time">Time Left: <span id="time-player-2">10:00</span></div>
+            </div>
+        </div>
+
+        <!-- Move History Table -->
+        <div class="history-section">
+            <h3>Move History</h3>
+            <table id="move-history">
+                <thead>
+                    <tr>
+                        <th>Move #</th>
+                        <th>Color</th>
+                        <th>Type</th>
+                        <th>Movement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Moves will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <script src="./js/game.js"></script>
+    <script>
+        
+        window.onload = function () {
+            const modal = document.getElementById("waiting-modal");
+            modal.classList.add("show");
+        };
+        
+    </script>
 </body>
 
 </html>
