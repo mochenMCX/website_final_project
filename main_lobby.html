@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create or Join Game</title>
+    <title>Lobby</title>
     <style>
         /* General Reset */
         * {
@@ -11,15 +11,27 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        /*
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /*color: #fff;*/
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             flex-direction: column;
+        }
+        */
+        body {
+            background: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), 
+                        url('img/chess_board2.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+
         }
 
         h1 {
@@ -29,8 +41,16 @@
         }
 
         /* Button Styles */
+        .button-container {
+            position: fixed; /* Sticks the container to the bottom */
+            bottom: 30px;    /* Distance from the bottom */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;       /* Spacing between buttons */
+        }
         .button {
-            background-color: #4CAF50;
+            background-color: #34495e;
             border: none;
             color: white;
             font-size: 1.2rem;
@@ -101,7 +121,7 @@
 
         input[type="submit"] {
             width: 100%;
-            background-color: #007BFF;
+            background-color: #716178;
             color: white;
             border: none;
             padding: 12px;
@@ -111,7 +131,7 @@
         }
 
         input[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #4d4352;
         }
 
         /* Mobile Responsiveness */
@@ -216,26 +236,176 @@
         .go-back:active {
             background-color: #9f75a1;
         }
-        
+        .popup {
+            position: fixed;
+            top: 20px;
+            left: 50%; /* Positioning the left side in the center */
+            transform: translateX(-50%); /* Adjusting the position back by half the width */
+            background-color: #e38db2;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 2s ease-out;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        }
+        .popup.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        /* Profile Button */
+        .profile-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .profile-button {
+            width: 100px;
+            height: 100px;
+            background-color: #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            background-image: url('img/profile.jpg'); /* Optional: replace with an actual image path */
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+        }
+
+        .profile-popup {
+            position: absolute;
+            top: 0px;
+            right: 100px;
+            width: 350px;
+            background-color: white;
+            color: grey;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            display: none; /* Hidden by default */
+            z-index: 1000;
+        }
+
+        .profile-popup h3 {
+            margin-bottom: 10px;
+        }
+
+        .profile-popup p {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .profile-popup button {
+            width: 100%;
+            padding: 10px;
+            background-color: grey;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .profile-popup button:hover {
+            background-color: darkgrey;
+        }
+
+        /* Container for recent game blocks */
+        .recent-games-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: fixed;
+            bottom: 270px; /* Adjust this value to change the vertical position */
+            width: 100%;
+            gap: 80px;
+            padding: 0 10px;
+            z-index: 1000;
+        }
+
+        /* Style for each game block */
+        .recent-game-block {
+            background-color: #f1f1f1;
+            padding: 30px;
+            border-radius: 10px;
+            width: 280px;
+            height: 180px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.5s forwards;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Button style in each block */
+        .recent-game-block button {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .recent-game-block button:hover {
+            background-color: #45a049;
+        }
 
     </style>
 </head>
 <body>
 
+    <div class="profile-container">
+        <div class="profile-button" id="profileButton"></div>
+        <div class="profile-popup" id="profilePopup">
+            <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+            <p><strong>Winrate:</strong> <span id="profileWinrate"></span></p>
+            <button id="logoutButton">Logout</button>
+        </div>
+    </div>
+
+    <div id="login-popup" class="popup">Successful login as <span id="user-name"></span>!</div>
+
     <button id="goBackButton" class="go-back" onclick="refreshPage()">Go Back</button>
 
-    <h1 >Game Lobby</h1>
+    <h3 id="recentGamesTitle" style="position: fixed; top: 170px; color: #59697d; font-size: 20px">Recent history:</h3>
+    <div id="recent-games" class="recent-games-container">
+    <!-- Game blocks will be dynamically inserted here -->
+    </div>
+
     
     <!-- Main buttons -->
-    <button class="button" id="createGameBtn">Create Game</button>
-    <button class="button" id="joinGameBtn">Join Game</button>
+    <div class="button-container">
+        <button class="button" id="createGameBtn">Create Game</button>
+        <button class="button" id="joinGameBtn">Join Game</button>
+    </div>
 
     <!-- Player selection form (initially hidden) -->
     <div id="player-selection">
-        <h2>Choose your color and enter your username</h2>
+        <h2>Choose your color</h2>
         <form id="createGameForm" action="create_game.php" method="POST">
             <!-- Username input -->
-            <input type="text" name="username" placeholder="Enter your username" required><br>
+            <input type="hidden" id="myInput" name="username">
             
             <div class="radio-group">
                 <label>
@@ -256,6 +426,63 @@
     </div>
 
     <script>
+        document.getElementById("myInput").value = sessionStorage.getItem("name");
+
+        // Toggle profile popup
+        document.addEventListener("DOMContentLoaded", () => {
+            const profileButton = document.getElementById("profileButton");
+            const profilePopup = document.getElementById("profilePopup");
+
+            profileButton.addEventListener("click", () => {
+                profilePopup.style.display = profilePopup.style.display === "block" ? "none" : "block";
+            });
+
+            // Close popup when clicking outside
+            document.addEventListener("click", (event) => {
+                if (!profilePopup.contains(event.target) && event.target !== profileButton) {
+                    profilePopup.style.display = "none";
+                }
+            });
+
+            // Populate profile info
+            
+            const userName = sessionStorage.getItem("name");
+            //const userEmail = sessionStorage.getItem("email"); // Replace with actual email fetching logic
+            document.getElementById("profileUsername").textContent = userName || "Guest";
+            //document.getElementById("profileEmail").textContent = userEmail || "Not provided";
+            
+        });
+
+        document.getElementById("logoutButton").addEventListener("click", function() {
+            // Redirect to login.html
+            window.location.href = "login.html";
+        });
+
+        console.log("login to lobby! username:", sessionStorage.getItem("name"));
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const userName = sessionStorage.getItem("name");
+            const popup = document.getElementById("login-popup");
+
+            // Set the username in the popup
+            if (userName) {
+                document.getElementById("user-name").textContent = userName;
+            }
+            else{
+                window.location.href="/website_final_project/login.html";
+            }
+
+            console.log("hi");
+            fetchGameHistory();
+
+            // Show the popup and fade it out after 10 seconds
+            
+            setTimeout(() => {
+                popup.classList.add("fade-out");
+            }, 4000); // 10 seconds
+            
+        });
+
         function refreshPage() {
             location.reload(); // Refreshes the page
         }
@@ -266,6 +493,7 @@
             document.getElementById("createGameBtn").style.display = "none";
             document.getElementById("joinGameBtn").style.display = "none";
             document.getElementById("goBackButton").style.display = "block";
+            document.getElementById("recent-games").style.display = "none";
         });
 
         document.getElementById("joinGameBtn").addEventListener("click", function() {
@@ -274,6 +502,7 @@
             document.getElementById("joinGameBtn").style.display = "none";
             document.getElementById("player-selection").style.display = "none";
             document.getElementById("goBackButton").style.display = "block";
+            document.getElementById("recent-games").style.display = "none";
             fetch('./php/search_game.php')
                 .then(response => response.json())
                 .then(data => {
@@ -301,7 +530,7 @@
                                     <button class="join-btn" onclick="enterGame(${game.game_id})">Join Game</button>
                                 </div>
                             `;
-                            gameListContainer.appendChild(gameOption);
+                            if (game.host_player != sessionStorage.getItem("name")) gameListContainer.appendChild(gameOption);
                         });
 
                         // Show the game list container
@@ -330,9 +559,84 @@
 
             form.appendChild(input);
 
+            const input2 = document.createElement('input');
+            input2.type = 'hidden';
+            input2.name = 'guest_player';
+            input2.value = sessionStorage.getItem("name");
+
+            form.appendChild(input2);
+
             // Append the form to the body and submit it
             document.body.appendChild(form);
             form.submit();
+        }
+
+        function fetchGameHistory() {
+            console.log("myname:", sessionStorage.getItem("name"), `./php/history_game.php?player_name=${sessionStorage.getItem("name")}`);
+            fetch(`./php/history_game.php?player_name=${sessionStorage.getItem("name")}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Assuming data is an array of game objects
+                //const historyContainer = document.getElementById('gameHistoryContainer');
+                //historyContainer.innerHTML = ''; // Clear any previous data
+                //console.log("data:", data.data, "length:", data.data.length);
+                let win = parseInt(0), lose = parseInt(0), had = parseInt(0);
+                if (data.data && data.data.length > 0) {
+                    const container = document.getElementById('recent-games');
+                    data.data.reverse().forEach(game => {
+                        console.log(game.game_id, game.status);
+
+                        let host_win = (game.host_player_color == game.status);
+                        let round_result = "";
+                        if (host_win == (game.host_player == sessionStorage.getItem("name"))){
+                            win++;
+                            round_result = "Win";
+                        }
+                        else{
+                            lose++;
+                            round_result = "Lose";
+                        }
+                        console.log(game, win, lose);
+
+                        // Create a container for each game's details
+                        const gameBlock = document.createElement('div');
+                        const name = sessionStorage.getItem("name");
+                        gameBlock.classList.add('recent-game-block');
+                        
+                        // Fill the block with game info (game_id, winner, etc.)
+                        gameBlock.innerHTML = `
+                            <h4 style="margin-bottom: 10px;">Game ID: ${game.game_id}</h4>
+                            <p style="margin-bottom: 10px;">Opponent: ${game.host_player == name ? game.guest_player : game.host_player}</p>
+                            <p style="margin-bottom: 20px;"><strong>Result:</strong> <span style="color: ${round_result == "Win" ? 'green' : 'red'}">${round_result}</span></p>
+                            <button onclick="redirectToReview(${game.game_id})">Review Game</button>
+                        `;
+                        
+                        // Append the new block to the container
+                        had++;
+                        if (had <= 4) container.appendChild(gameBlock);
+                    });
+                    let total = parseInt(win) + parseInt(lose);
+                    let winrate = parseFloat((win / total).toFixed(2)) * 100;
+                    document.getElementById("profileWinrate").textContent = `${win}W/${lose}L (${winrate}%)`;
+
+                } else {
+                    document.getElementById("profileWinrate").textContent = "0W/0L";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching game history:', error);
+                alert('Failed to load game history.');
+            });
+        }
+        function redirectToReview(gameId) {
+            // Redirect to review.php with game_id as a query parameter
+            sessionStorage.setItem("game_id", gameId);
+            window.location.href = `review.html`;
         }
     </script>
 

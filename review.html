@@ -1,13 +1,85 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Western Chess</title>
+    <title>Review</title>
     <link href="./css/styles.css" rel="stylesheet" type="text/css">
     <link href="./css/display_styles.css" rel="stylesheet" type="text/css">
     <link href="./css/tailwind.min.css" rel="stylesheet" type="text/css">
     <script src="./js/lib/jquery.min.js"></script>
     <style>
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #controls {
+            position: fixed;
+            bottom: 120px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background color: #a67942;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:disabled {
+            background color: #694c29;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .navigation-buttons {
+            position: fixed;
+            bottom: 100px; /* Adjust distance from the bottom */
+            right: 290px; /* Adjust distance from the right */
+            display: flex;
+            gap: 10px; /* Space between the buttons */
+        }
+
+        .navigation-buttons button {
+            background-color: #a67942; /* Modern blue */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 120px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navigation-buttons button:hover {
+            background-color: #694c29; /* Darker blue */
+            transform: translateY(-3px);
+        }
+
+        .navigation-buttons button:active {
+            background-color: #694c29; /* Even darker blue */
+            transform: translateY(0);
+        }
+
         .home-button {
             position: fixed;
             top: 20px; /* Distance from the top */
@@ -35,9 +107,8 @@
         }
     </style>
 </head>
-<!-- <title>final_project</title> -->
+
 <body>
-    <!--<link rel="stylesheet" href="/website_final_project/css/display_styles.css">-->
     <button class="home-button" onclick="goHome()">Home</button>
     <div class="board-container">
         <div class="board">
@@ -207,89 +278,29 @@
             <div class="blank"></div>
         </div>
         <div class="chess-game">
-            <div class="player-section">
+            <div class="player-section" style="width: 250px">
                 <div class="player" id="player-1">
                     <h2 id = "black-indicator">Player Black</h2>
                     <h3> <img src = "./img/black.png" width="70px" height="70px" style="margin: auto;"></img></h3> 
-                    <div class="time">Time Left: <span id="time-player-1">10:00</span></div>
                 </div>
                 <div class="player" id="player-2">
                     <h2 id = "white-indicator"><span span style="color: red;">&#x25B2;</span>Player White<span span style="color: red;">&#x25B2;</span></h2>
                     <img src = "./img/white.png" width="70px" height="70px" style="margin: auto;"></img>
-                    <div class="time">Time Left: <span id="time-player-2">10:00</span></div>
                 </div>
             </div>
-            <div class="history-section">
-                <h3>Move History</h3>
-                <table id="move-history">
-                    <thead>
-                        <tr>
-                            <th>Move #</th>
-                            <th>Color</th>
-                            <th>Type</th>
-                            <th>Movement</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+        </div>
+        <div class="navigation-buttons" id="controls">
+            <button id="previousButton" disabled>Previous</button>
+            <button id="nextButton" disabled>Next</button>
         </div>
     </div>
 
-    <div id="waiting-modal" class="modal show">
-        <div class="modal-content">
-            <h2 id = "modal-text">Waiting for other player to join...</h2>
-        </div>
-    </div>
-    <!--
-    <div class="chess-game">
-        <div class="player-section">
-            <div class="player" id="player-1">
-                <h2 id = "black-indicator">Player Black</h2>
-                <div class="time">Time Left: <span id="time-player-1">10:00</span></div>
-            </div>
-            <div class="player" id="player-2">
-                <h2 id = "white-indicator"><span span style="color: red;">&#x25B2;</span>Player White<span span style="color: red;">&#x25B2;</span></h2>
-                <div class="time">Time Left: <span id="time-player-2">10:00</span></div>
-            </div>
-        </div>
-        <div class="history-section">
-            <h3>Move History</h3>
-            <table id="move-history">
-                <thead>
-                    <tr>
-                        <th>Move #</th>
-                        <th>Color</th>
-                        <th>Type</th>
-                        <th>Movement</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    -->
-
-    <script src="./js/game.js"></script>
+    <script src="./js/review.js"></script>
     <script>
-        window.onload = function () {
-            const modal = document.getElementById("waiting-modal");
-            //modal.classList.add("show");
-            document.getElementById("modal-text").textContent = `Waiting for other player to join...
-            Game ID: ${sessionStorage.getItem("game_id")}`;
-
-        };
         function goHome() {
-            if (sessionStorage.getItem("result") == "active") {
-                alert("Cant leave game before it is finished!")
-                return;
-            }
             // Redirect to the home page (adjust the URL if necessary)
             window.location.href = 'main_lobby.html'; // Replace 'index.html' with your home page URL
         }
-        
     </script>
 </body>
 

@@ -11,7 +11,7 @@ try {
 
     $stmt = $pdo->prepare("SELECT * FROM movement WHERE game_id = ? AND round = ?");
 
-    $game_id = $_SESSION['game_id'];
+    $game_id = (isset($_GET['game_id']) && $_GET['game_id'] != "null") ? $_GET['game_id'] : $_SESSION['game_id'];
     $target_round = (int) $_GET['target_round'];
 
     $stmt->execute([$game_id, $target_round]);
