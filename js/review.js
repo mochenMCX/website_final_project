@@ -638,7 +638,7 @@ const historyStack = [];
 let currentIndex = -1;
 
 function saveSnapshot() {
-    const snapshot = document.documentElement.outerHTML;
+    const snapshot = document.body.innerHTML; // !!!!!!!!!!!!! change this line!
     if (currentIndex < historyStack.length - 1) {
         historyStack.splice(currentIndex + 1);
     }
@@ -647,10 +647,9 @@ function saveSnapshot() {
     updateButtons();
 }
 
-function restoreSnapshot(index) {
-    document.open();
-    document.write(historyStack[index]);
-    document.close();
+//
+function restoreSnapshot(index) {  // !!!!!!!!!!!!!!!!!change this function!
+    document.body.innerHTML = historyStack[index];
     reinitialize();
 }
 
