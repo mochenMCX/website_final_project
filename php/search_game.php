@@ -10,7 +10,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Query to fetch games that are available (you can modify this query based on your needs)
-    $stmt = $pdo->query("SELECT game_id, host_player, host_player_color FROM games");
+    $stmt = $pdo->query("SELECT game_id, host_player, host_player_color FROM games where status = 'waiting'");
 
     // Fetch all games into an associative array
     $games = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -106,19 +106,6 @@
     background-image: url(./../img/chesses/white-pawn.png);
 }
 
-.board {
-    width: 596px;
-    min-width: 596px;
-    height: 596px;
-    min-height: 596px;
-    margin: 1px;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    /* margin: auto; */
-}
 
 .grid:hover {
     cursor: pointer;

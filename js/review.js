@@ -11,18 +11,7 @@ let black_time = parseInt(300);
 let white_time = parseInt(300);
 let black_name = "";
 let white_name = "";
-
-function choose(s){
-    sessionStorage.setItem("side", s);
-    window.location.href="/website_final_project/index.html";
-}
-
-function formatTime(seconds) {
-    let minutes = Math.floor(seconds / 60);
-    let sec = seconds % 60;
-    if (seconds < 0) return "00:00";
-    return `${minutes < 10 ? '0' : ''}${minutes}:${sec < 10 ? '0' : ''}${sec}`;
-}
+let gamelist = [];
 
 function game() {
     side = sessionStorage.getItem("side");
@@ -31,7 +20,7 @@ function game() {
     console.log("initial round:", last_round);
     function checkForNewMoves() {
         //console.log("check", `./php/check_last_move.php?target_round=${parseInt(last_round) + 1}`);
-        fetch(`./php/check_last_move.php?target_round=${parseInt(last_round) + 1}`)
+        fetch(`./php/check_last_move.php?target_round=${parseInt(last_round) + 1}&game_id=${sessionStorage.getItem("game_id")}`)
             .then(response => response.json())
             .then(data => {
                 // console.log(data);
@@ -45,37 +34,6 @@ function game() {
     }
     // 模擬輪循每隔一段時間檢查一次
     setInterval(checkForNewMoves, 200); // 每秒檢查一次
-
-    let timer = setInterval(function() {
-        //console.log("before black:", black_time, "white:", white_time);
-        if (sessionStorage.getItem("result") != "active") {
-            black_time = sessionStorage.getItem("black_time");
-            white_time = sessionStorage.getItem("white_time");
-            console.log("black:", black_time, "white:", white_time);
-            document.getElementById("time-player-1").textContent = black_time;
-            document.getElementById("time-player-2").textContent = white_time;
-            return;
-        }
-        if (white_time >= 0 && last_round % 2 == 0){
-            white_time--;
-        }
-        if (black_time >= 0 && last_round % 2 == 1){
-            black_time--;
-        }
-        if (white_time < 0){
-            clearInterval(timer);  // Stop the timer when time reaches 0
-            alert("White Time's up!");
-            endgame("black");
-        }
-        if (black_time < 0){
-            clearInterval(timer);  // Stop the timer when time reaches 0
-            alert("Black Time's up!");
-            endgame("white");
-        }
-        console.log("black:", black_time, "white:", white_time);
-        document.getElementById("time-player-1").textContent = formatTime(black_time);
-        document.getElementById("time-player-2").textContent = formatTime(white_time);
-    }, 1000);
 
     function updateTable(data){
         const tableBody = document.querySelector("#move-history tbody");
@@ -98,14 +56,6 @@ function game() {
         // Append the row to the table body
         tableBody.appendChild(row);
 
-        if (data.color == "white"){
-            document.getElementById("black-indicator").innerHTML = `<span style="color: red;">&#x25B2;</span>${black_name}<span style="color: red;">&#x25B2;</span>`
-            document.getElementById("white-indicator").innerHTML = `&#x25B2;${white_name}&#x25B2;`
-        }
-        else{
-            document.getElementById("black-indicator").innerHTML = `&#x25B2;${black_name}&#x25B2;`
-            document.getElementById("white-indicator").innerHTML = `<span span style="color: red;">&#x25B2;</span>${white_name}<span span style="color: red;">&#x25B2;</span>`
-        }
 
         while (tableBody.rows.length > 10) {
             tableBody.deleteRow(0); // Remove the first row
@@ -129,9 +79,10 @@ function game() {
                 black_name = data.guest_player;
                 white_name = data.host_player;
             }
-            document.getElementById("black-indicator").innerHTML = `&#x25B2;${black_name}&#x25B2;`
-            document.getElementById("white-indicator").innerHTML = `<span span style="color: red;">&#x25B2;</span>${white_name}<span span style="color: red;">&#x25B2;</span>`
-            console.log("yo!");
+            document.getElementById("black-indicator").innerHTML = `${black_name}`
+            document.getElementById("white-indicator").innerHTML = `${white_name}`
+            console.log("data:", data);
+            saveSnapshot();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -176,30 +127,13 @@ function game() {
     }
 
     function updateBoard(data) {
-        black_time = data.black_time;
-        white_time = data.white_time;
-        last_round = data.round;
 
-        if (data.color == "white" && data.round > 0){
-            let pre_time = new Date(data.time_stamp);
-            let cur_time = new Date();
-            //console.log("pre:", pre_time, "cur:", cur_time, "dif:", Math.floor((pre_time - cur_time) / 1000));
-            black_time -= Math.floor((cur_time - pre_time) / 1000);
-        }
-        if (data.color == "black" || data.round == 0){
-            let pre_time = new Date(data.time_stamp);
-            let cur_time = new Date();
-            //console.log("pre:", pre_time, "cur:", cur_time, "dif:", Math.floor((pre_time - cur_time) / 1000));
-            white_time -= Math.floor((cur_time - pre_time) / 1000);
-        }
+        last_round = data.round;
 
         if (data.round == 0) {
             startgame();
-            const modal = document.getElementById("waiting-modal");
-            modal.classList.remove("show");
             return;
         }
-        updateTable(data);
 
         var $fromGrid = $("#"+data.start_pos);
         var $piece1 = $($fromGrid.children(".chess")[0]);
@@ -210,6 +144,8 @@ function game() {
         $toGrid.append($piece1);
         turn = 1;
         finish();
+        //updateTable(data);
+        saveSnapshot();
     }
 
 
@@ -245,23 +181,25 @@ function game() {
     function finish() {
         if (document.getElementById("black-king") == undefined) {
             endgame("white");
-            alert("White wins!");
+            console.log("白方勝利");
             return;
         }
 
         if (document.getElementById("white-king") == undefined) {
             endgame("black");
-            alert("Black wins!");
+            console.log("黑方勝利");
             return;
         }
     }
 
     // color
+    /*
     function color(grids, className) {
         for (var grid of grids) {
             $("#"+grid).toggleClass(className);
         }
     }
+    */
 
     // for action
     function clearBaforeMove() {
@@ -284,152 +222,7 @@ function game() {
         }
     }
 
-    // check this after
-    $(".grid").click(function () {      //點擊偵測
-        var $grid = $(this);
-
-        if (side == "white" && last_round % 2 == 1){ // 檢查是否輪到自己
-            return;
-        }
-
-        if (side == "black" && last_round % 2 == 0){
-            return;
-        }
-
-        if(turn == 0){
-            return;
-        }
-        if(action.length == 0 && $grid.children("." + other).length > 0){
-            return;
-        }
-        clearBaforeMove();
-        $grid.toggleClass("active");
-        console.log(action.length);
-        if (action.length == 0) {       //選擇棋子
-            if ($grid.children(".chess").length == 1) {     
-                var $piece1 = $($grid.children(".chess")[0]);
-                
-                var movableGrids = movableScope($piece1);
-                color(movableGrids, "movable-scope");
-
-                var attackableGrids = attackableScope($piece1);
-                color(attackableGrids, "attackable-scope");
-
-                action.push($piece1.attr("color"));
-                action.push($piece1.attr("type"));
-                action.push($grid.attr("id"));
-                console.log(action);        //debug
-            }
-            return;
-        }
-
-        if (action.length == 3) {       //移動
-            var $fromGrid = $("#"+action[2]);
-            var $piece1 = $($fromGrid.children(".chess")[0]);
-
-            var movableGrids = movableScope($piece1);
-            var attackableGrids = attackableScope($piece1);
-
-            // target block
-            var gridId = $grid.attr("id");
-
-            if (gridId != action[2] && (movableGrids.indexOf(gridId) != -1 || attackableGrids.indexOf(gridId) != -1)) {
-                // 目标格子处在棋子的可移动范围或者可攻击范围内
-
-                var $fromGrid = $("#"+action[2]);
-                var $toGrid = $grid;
-
-                // 根据目标格子上有没有敌方的棋子, 选择攻击或者移动
-                if ($toGrid.children(".chess").length > 0) {
-                    // 目标格子有其他棋子
-
-                    // 目标格子上的棋子
-                    var $piece2 = $($toGrid.children(".chess")[0]);
-                    if ($piece1.attr("color") != $piece2.attr("color")) {
-                        // 目标格子上的棋子是敌方的棋子
-
-                        // 攻击
-                        $fromGrid.remove($piece1);
-                        $toGrid.empty();
-                        $toGrid.append($piece1);
-                    }
-
-                } else {
-                    // 目标格子有其他棋子
-
-                    // 移动
-                    $fromGrid.remove($piece1);
-                    $toGrid.append($piece1);
-                }
-
-                // 检查棋子类型是不是离开了初始位置的士兵
-                if ($piece1.hasClass("initial")) {
-                    $piece1.removeClass("initial");
-                }
-
-
-                /*棋子移动或者攻击完成后, 检查国王是否存在, 是否被将军*/
-                checkmate($piece1);
-                finish();
-            } else {
-                // 目标格子不处在棋子的可移动范围或者可攻击范围内
-
-                // 清除行动记录
-                clearAction();
-                return;
-            }
-            last_round = parseInt(last_round) + 1;
-            action.push(gridId);
-            console.log(JSON.stringify({action}));
-
-            // update table
-            const newMove = {chess: action[1], round: last_round, color: side, start_pos: action[2], end_pos: action[3]};
-            updateTable(newMove);
-
-            // caclulate remaining time!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-            action.push(black_time);
-            action.push(white_time);
-
-            //push the data into database
-            fetch("./php/save_action.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.status === "success") {
-                    console.log("Actions saved successfully!");
-                } else {
-                    console.error("Error saving actions:", data.message);
-                }
-            })
-            .catch((error) => console.error("Fetch error:", error));
-            turn = 0;
-            clearAction();
-        }
-
-        // if (action.length == 4) {
-        //     if ($grid.children(".chess").length == 1) {
-        //         var $piece1 = $($grid.children(".chess")[0]);
-
-        //         if ($piece1.attr("color") != action[0]) {
-        //             var movableGrids = movableScope($piece1);
-        //             color(movableGrids, "movable-scope");
-
-        //             var attackableGrids = attackableScope($piece1);
-        //             color(attackableGrids, "attackable-scope");
-
-        //             clearAction();
-        //             action.push($piece1.attr("color"));
-        //             action.push($piece1.attr("type"));
-        //             action.push($grid.attr("id"));
-        //         }                
-        //     }
-        //     return;
-        // }
-    });
+    
     //確認可到達的位置
     function movableScope(piece) {
         var scope = [];
@@ -819,7 +612,7 @@ function game() {
         }
     }
 }
-
+/*
 let lastActiveTime = Date.now();
 
 document.addEventListener('visibilitychange', () => {
@@ -834,14 +627,55 @@ document.addEventListener('visibilitychange', () => {
         }
     }
 });
-
-if (!sessionStorage.getItem("name")){
-    window.location.href="/website_final_project/login.html";
-}
-
-if(window.location.pathname.endsWith("/index.html")){
+*/
+if(window.location.pathname.endsWith("/review.html")){
     console.log("start");
     game();
 }
 
 
+const historyStack = [];
+let currentIndex = -1;
+
+function saveSnapshot() {
+    const snapshot = document.documentElement.outerHTML;
+    if (currentIndex < historyStack.length - 1) {
+        historyStack.splice(currentIndex + 1);
+    }
+    historyStack.push(snapshot);
+    currentIndex++;
+    updateButtons();
+}
+
+function restoreSnapshot(index) {
+    document.open();
+    document.write(historyStack[index]);
+    document.close();
+    reinitialize();
+}
+
+function updateButtons() {
+    document.getElementById('previousButton').disabled = currentIndex <= 0;
+    document.getElementById('nextButton').disabled = currentIndex >= historyStack.length - 1;
+}
+
+function reinitialize() {
+    document.getElementById('previousButton').addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            restoreSnapshot(currentIndex);
+        }
+    });
+
+    document.getElementById('nextButton').addEventListener('click', () => {
+        if (currentIndex < historyStack.length - 1) {
+            currentIndex++;
+            restoreSnapshot(currentIndex);
+        }
+    });
+
+    updateButtons();
+}
+
+//saveSnapshot();
+reinitialize();

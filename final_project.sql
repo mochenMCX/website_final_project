@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2024 年 12 月 11 日 15:22
+-- 產生時間： 2024 年 12 月 12 日 12:28
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.0.30
 
@@ -31,7 +31,9 @@ CREATE TABLE `games` (
   `game_id` int(11) NOT NULL,
   `start_time` date NOT NULL DEFAULT current_timestamp(),
   `host_player` varchar(256) DEFAULT NULL,
-  `host_player_color` varchar(255) DEFAULT NULL
+  `host_player_color` varchar(255) DEFAULT NULL,
+  `guest_player` varchar(256) DEFAULT NULL,
+  `status` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -52,6 +54,17 @@ CREATE TABLE `movement` (
   `black_time` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `users`
+--
+
+CREATE TABLE `users` (
+  `name` varchar(15) NOT NULL,
+  `password` varchar(256) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- 已傾印資料表的索引
 --
@@ -69,6 +82,12 @@ ALTER TABLE `movement`
   ADD PRIMARY KEY (`round`,`game_id`);
 
 --
+-- 資料表索引 `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`name`);
+
+--
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
 --
 
@@ -76,7 +95,7 @@ ALTER TABLE `movement`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `games`
 --
 ALTER TABLE `games`
-  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
