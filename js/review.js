@@ -1,7 +1,6 @@
 /*
     game.js: 实现游戏逻辑
 */
-
 let side = "white";//default, choose before the game beginning
 let other = "black";
 let last_round = parseInt(-1);
@@ -13,8 +12,6 @@ let white_time = parseInt(300);
 let black_name = "";
 let white_name = "";
 let gamelist = [];
-
-
 
 function game() {
     side = sessionStorage.getItem("side");
@@ -649,6 +646,7 @@ function saveSnapshot() {
     currentIndex++;
     updateButtons();
 }
+
 //
 function restoreSnapshot(index) {  // !!!!!!!!!!!!!!!!!change this function!
     document.body.innerHTML = historyStack[index];
