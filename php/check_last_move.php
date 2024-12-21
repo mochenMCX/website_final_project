@@ -1,13 +1,10 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-$dsn = 'mysql:host=localhost;dbname=final_project;charset=utf8mb4';
-$username = 'root';
-$password = '';
+
+require 'db.php';
 
 try {
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $stmt = $pdo->prepare("SELECT * FROM movement WHERE game_id = ? AND round = ?");
 

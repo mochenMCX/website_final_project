@@ -6,13 +6,9 @@ ini_set('log_errors', '1');     // 啟用錯誤記錄
 ini_set('error_log', "D:\user\Desktop\debug.log"); // 設定錯誤記錄檔路徑
 
 // 連接資料庫
-$dsn = 'mysql:host=localhost;dbname=final_project;charset=utf8mb4';
-$username = 'root';
-$password = '';
+require 'db.php';
 
 try {
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // 獲取前端數據
     $data = json_decode(file_get_contents('php://input'), true);

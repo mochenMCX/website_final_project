@@ -1,12 +1,7 @@
 <?php
 session_start();
 
-$dsn = 'mysql:host=localhost;dbname=final_project;charset=utf8mb4';
-$username = 'root';
-$password = '';
-
-$pdo = new PDO($dsn, $username, $password);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+require 'db.php';
 
 // Check if game_id is received from POST request
 if (isset($_POST['game_id'])) {
@@ -14,14 +9,24 @@ if (isset($_POST['game_id'])) {
     $_SESSION['game_id'] = $game_id;
     $guest_player = $_POST['guest_player'];
     
-    $stmt = $pdo->prepare("SELECT host_player, host_player_color FROM games WHERE game_id = ? AND status = 'waiting'");
+    $stmt = $pdo->prepare("SELECT host_player, host_player_color, password FROM games WHERE game_id = ? AND status = 'waiting'");
     $stmt->execute([$game_id]);
     $game = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $stmt = $pdo->prepare("DELETE FROM games where host_player = ? and status = 'waiting'");
     $stmt->execute([$guest_player]);
 
+    $game_password = isset($_POST['password']) ? $_POST['password'] : NULL;
+
     if ($game) {
+        if ($game['password'] != NULL && !password_verify($game_password, $game['password'])){
+            echo '<script type="text/javascript">
+            alert("Wrong game room password. Please try again.");
+            window.location.href = "../main_lobby.html";
+            </script>';
+            exit();
+        }
+
         // Delete the original 'waiting' game
         $deleteSql = "DELETE FROM games WHERE game_id = ?";
         $deleteStmt = $pdo->prepare($deleteSql);
