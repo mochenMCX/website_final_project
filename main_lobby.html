@@ -371,6 +371,44 @@
             background-color: #45a049;
         }
 
+        .password-group {
+            margin-bottom: 20px;
+        }
+
+        .password-label {
+            font-size: 14px;
+            color: #666;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .password-input:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        }
+
+        .game-actions {
+            display: flex;
+            flex-direction: column; /* Arrange items vertically */
+            /*align-items: flex-start; /* Align items to the left */
+            gap: 15px; /* Add spacing between elements */
+            margin-top: 10px; /* Space between game-info and game-actions */
+        }
+
     </style>
 </head>
 <body>
@@ -415,7 +453,17 @@
                     <input type="radio" name="playerColor" value="white" color="black"> White
                 </label>
             </div>
-            
+            <div class="password-group">
+                <label for="password" class="password-label">Game Room Password (optional):</label>
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter a password" 
+                        class="password-input">
+                </div>
+            </div>
             <input type="submit" value="Start Game">
         </form>
     </div>
@@ -520,16 +568,37 @@
                             gameOption.className = 'game-option';
 
                             // Create the game name and join button
-                            gameOption.innerHTML = `
+                            if (game.password == null){
+                                gameOption.innerHTML = `
+                                <div class="game-info">
+                                    <h4>Game ID: ${game.game_id}</h4>
+                                    <p><strong>Created By:</strong> ${game.host_player}</p>
+                                    <p><strong>You play:</strong> ${game.host_player_color == "white" ? "black" : "white"}</p>
+                                    <p><strong>Require password:</strong> None</p>
+                                </div>
+                                <div class="game-actions">
+                                    <button class="join-btn" onclick="enterGame(${game.game_id})">Join Game</button>
+                                </div>
+                                `;
+                            }
+                            else{
+                                gameOption.innerHTML = `
                                 <div class="game-info">
                                     <h4>Game ID: ${game.game_id}</h4>
                                     <p><strong>Created By:</strong> ${game.host_player}</p>
                                     <p><strong>You play:</strong> ${game.host_player_color == "white" ? "black" : "white"}</p>
                                 </div>
                                 <div class="game-actions">
+                                    <input 
+                                    type="password" 
+                                    id="password-${game.game_id}" 
+                                    placeholder="Enter game password" 
+                                    class="password-input">
                                     <button class="join-btn" onclick="enterGame(${game.game_id})">Join Game</button>
                                 </div>
-                            `;
+                                `;
+                            }
+
                             if (game.host_player != sessionStorage.getItem("name")) gameListContainer.appendChild(gameOption);
                         });
 
@@ -566,6 +635,13 @@
 
             form.appendChild(input2);
 
+            const input3 = document.createElement('input');
+            input3.type = 'hidden';
+            input3.name = 'password';
+            const passwordInput = document.getElementById(`password-${gameId}`);
+            input3.value = passwordInput ? passwordInput.value : null;
+
+            form.appendChild(input3);
             // Append the form to the body and submit it
             document.body.appendChild(form);
             form.submit();

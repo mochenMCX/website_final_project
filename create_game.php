@@ -1,11 +1,6 @@
 <?php
     session_start();
-    $dsn = 'mysql:host=localhost;dbname=final_project;charset=utf8mb4';
-    $username = 'root';
-    $password = '';
-
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    require './php/db.php';
 
     if (isset($_POST['playerColor']) and isset($_POST['username'])) {
         $playerColor = $_POST['playerColor'];
@@ -15,10 +10,11 @@
     $stmt = $pdo->prepare("DELETE FROM games where host_player = ? and status = 'waiting'");
     $stmt->execute([$username]);
 
+    $password = isset($_POST['password']) && $_POST['password'] != '' ? password_hash($_POST['password'], PASSWORD_DEFAULT) : NULL;
 
     // Insert query
-    $stmt = $pdo->prepare("INSERT INTO games (host_player, host_player_color, status) VALUES (?, ?, ?)");
-    $stmt->execute([$username, $playerColor, "waiting"]);
+    $stmt = $pdo->prepare("INSERT INTO games (host_player, host_player_color, status, password) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$username, $playerColor, "waiting", $password]);
 
     // Get the ID of the inserted row
     $game_id = $pdo->lastInsertId();

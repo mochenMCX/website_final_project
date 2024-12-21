@@ -138,14 +138,13 @@ function game() {
         });
     }
 
-
-    function endgame(winner) {
+    function endgame(winner, surrender = false) {
         if (sessionStorage.getItem("result") != "active") return;
         var game_id = sessionStorage.getItem("game_id");;
 
         // Let winner update
 
-        if (winner == side){
+        if (winner == side || surrender){
             var formData = new FormData();
             formData.append('game_id', game_id);
             formData.append('winner', winner);

@@ -1,12 +1,8 @@
 <?php
 session_set_cookie_params(7200);
 session_start();
-$dsn = 'mysql:host=localhost;dbname=final_project;charset=utf8mb4';
-$username = 'root';
-$password = '';
-$pdo = new PDO($dsn, $username, $password);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+require 'db.php';
 
 if (isset($_POST['action'])) {
     $name = $_POST['username'];

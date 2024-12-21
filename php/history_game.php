@@ -2,12 +2,7 @@
 session_start();
 
 // Connect to your database (replace with your database credentials)
-$dsn = 'mysql:host=localhost;dbname=final_project;charset=utf8mb4';
-$username = 'root';
-$password = '';
-
-$pdo = new PDO($dsn, $username, $password);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+require 'db.php';
 
 try {
     // Get the player_name from POST or fallback to session (if relevant)
