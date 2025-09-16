@@ -6,7 +6,7 @@
 
 ## Online International Chess Platform
 
-![image](https://hackmd.io/_uploads/Bygr_E8u4ye.png =70%x)
+![image](https://hackmd.io/_uploads/Bygr_E8u4ye.png)
 
 We are motivated to create an online chess platform that focuses on convenience and accessibility, with easy registration and quick match creation. The platform will offer seamless matchmaking, allowing users to play with friends or others effortlessly. Additionally, it will include all essential features like timer mechanism, move history, analysis tools, ensuring a user-friendly and comprehensive chess experience for players of all levels.
 
@@ -15,7 +15,7 @@ We are motivated to create an online chess platform that focuses on convenience 
 These are our features of our online chess platform.
 
 ### Account System
-![image](https://hackmd.io/_uploads/SksG8UuNkg.png =60%x)
+![image](https://hackmd.io/_uploads/SksG8UuNkg.png)
 
 A secure database is used to store user accounts and hashed passwords. This ensures a reliable account system. Players’ historical game records are saved, enabling them to review past matches. Additionally, the system calculates and displays each player’s win rate in their profile, providing a detailed overview of their performance.
 
